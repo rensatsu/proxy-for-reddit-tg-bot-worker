@@ -1,10 +1,6 @@
 import { errorResponse, successResponse } from "./utils/response";
 import { error, debug } from "./utils/logger";
 
-addEventListener("fetch", event => {
-  event.respondWith(handleRequest(event.request));
-});
-
 async function tgPost(method, data = {}) {
   const url = `https://api.telegram.org/bot${TG_TOKEN}/${method}`;
   const response = await fetch(url, {
