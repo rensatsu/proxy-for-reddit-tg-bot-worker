@@ -30,7 +30,8 @@ async function setWebhook(url) {
   });
 
   await debug("setWebhook", "setWebhook response", {
-    url, res
+    url,
+    res,
   });
 
   return res;
@@ -56,7 +57,9 @@ function checkRedditLink(text) {
   // https://old.reddit.com/r/battlestations/comments/jwbd8p/minimalist_with_a_pinch_of_steampunk/
   // https://reddit.com/r/battlestations/comments/jwbd8p
   // https://redd.it/jwbd8p
-  const match = text.match(/(reddit\.com|redd\.it)(\/r\/([\w\d\_]+)\/comments|)\/(?<id>[\w\d]+)(.*)/);
+  const match = text.match(
+    /(reddit\.com|redd\.it)(\/r\/([\w\d\_]+)\/comments|)\/(?<id>[\w\d]+)(.*)/
+  );
   if (!match) return null;
   return match.groups.id;
 }
@@ -67,24 +70,17 @@ async function handleRedditPost(to, postId) {
   if (!response.ok) throw new Error("Reddit request failed");
   const json = await response.json();
 
-  // better to use '?.'
-  let post = null;
-  try {
-    post = json[0].data.children[0].data;
-  } catch (_) { }
+  const post = json?.[0]?.data?.children?.[0]?.data;
   if (!post) throw new Error("Reddit request returned bad response");
 
   const postTitle = post.title;
   const postSubreddit = post.subreddit;
   const postAuthor = post.author;
   const postUrl = post.url;
-
-  // better to use '?.'
-  let postPreview = null;
-  try {
-    postPreview = post.preview.images[0].source.url.replace(/&amp;/, "&");
-  } catch (_) { }
-
+  const postPreview = post?.preview?.images?.[0]?.source?.url.replace(
+    /&amp;/,
+    "&"
+  );
   const isNsfw = post.over_18;
 
   const text = postTitle;
@@ -117,9 +113,9 @@ async function handleRedditPost(to, postId) {
         {
           text: "URL",
           url: postUrl,
-        }
-      ]
-    ]
+        },
+      ],
+    ],
   };
 
   if (postPreview) {
@@ -165,21 +161,30 @@ async function handleIncomingMessage(request, body) {
 
   if (isCommand(text, "start")) {
     await debug("telegram", "Start command", { id, firstName, lastName });
-    sendTextMessage(id, `Hi, ${firstName}! Send me a reddit link or forward me a message with reddit link.`);
+    await sendTextMessage(
+      id,
+      [
+        `Hi, ${firstName}!`,
+        `Your ID: ${id}.`,
+        `Send me a reddit link or forward me a message with reddit link.`,
+      ].join("\n")
+    );
     return;
   }
 
   const postId = checkRedditLink(text);
   if (postId) {
-    await handleRedditPost(id, postId)
-      .catch(async (err) => {
-        await sendTextMessage(id, `Unable to proxy this link: ${err.message}`);
-      });
+    await handleRedditPost(id, postId).catch(async err => {
+      await sendTextMessage(id, `Unable to proxy this link: ${err.message}`);
+    });
 
     return;
   }
 
-  sendTextMessage(id, `Send me a reddit link or forward me a message with reddit link.`);
+  sendTextMessage(
+    id,
+    `Send me a reddit link or forward me a message with reddit link.`
+  );
 }
 
 async function sendTextMessage(to, message) {
@@ -212,7 +217,7 @@ async function handleRequestBody(request, body) {
 async function handleRequest(request) {
   const method = request.method.toUpperCase();
   const url = new URL(request.url);
-  const appSecretRequest = (url.pathname + "/").split("/")[1]; // better to use '??'
+  const appSecretRequest = url.pathname.split("/")[1] ?? null;
   await debug("handleRequest", "start", { url: request.url, method });
   let body = null;
 
@@ -220,7 +225,9 @@ async function handleRequest(request) {
   try {
     const tmp = { TG_TOKEN, TG_WEBHOOK_SECRET };
   } catch (_) {
-    return await errorResponse("Required environment parameters are not defined");
+    return await errorResponse(
+      "Required environment parameters are not defined"
+    );
   }
 
   if (appSecretRequest !== TG_WEBHOOK_SECRET) {
@@ -241,7 +248,7 @@ async function handleRequest(request) {
   } catch (e) {
     await error("handleRequest", "Unable to parse incoming request", {
       message: e.message,
-      exception: e
+      exception: e,
     });
 
     return await errorResponse("Unable to parse incoming request", 400);

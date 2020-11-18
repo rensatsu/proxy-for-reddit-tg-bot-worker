@@ -5,16 +5,22 @@
   "description": "A template for kick starting a Cloudflare Workers project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write '**/*.{js,css,json,md}'",
     "dev": "wrangler dev",
     "publish:prod": "wrangler publish -e production",
-    "publish:dev": "wrangler publish"
+    "publish:dev": "wrangler publish",
+    "format": "prettier --write '**/*.{js,css,json,md}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rensatsu",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.1",
+    "@babel/plugin-proposal-optional-chaining": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
     "@cloudflare/wrangler": "^1.12.2",
-    "prettier": "^1.18.2"
+    "babel-loader": "^8.2.1",
+    "prettier": "^1.18.2",
+    "webpack": "^5.5.1"
   }
 }
