@@ -1,0 +1,10 @@
+name = "reddit-proxy-bot"
+type = "webpack"
+account_id = "123456789"
+workers_dev = true
+route = ""
+zone_id = ""
+webpack_config = "webpack.config.js"
+
+[env.production]
+webpack_config = "webpack.production.js"
