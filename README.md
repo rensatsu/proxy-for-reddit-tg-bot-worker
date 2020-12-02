@@ -1,5 +1,9 @@
 # Reddit Proxy Telegram Bot
 
+A simple Telegram bot which receives links to Reddit posts and sends back an information and preview of the post.
+
+> ⚠ Project is no longer supported.
+
 ## Worker Environment
 
 ### Production
